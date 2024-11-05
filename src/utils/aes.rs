@@ -1,3 +1,9 @@
+///AES-256-CBC 模式加密、解密、生成32位aeskey和16位iv
+/// 1. 采用256为cbc模式加解密
+/// 2. aeskey是32为，iv是16为；
+/// 3.aes加密后又使用了base64加密，aes解密数据前又实用了base64解密
+/// 4. aeskey和iv生成的时候都转换成16进制
+
 use crypto::aes;
 use crypto::aes::KeySize::KeySize256;
 use crypto::blockmodes::PkcsPadding;
@@ -6,7 +12,6 @@ use crypto::symmetriccipher::SymmetricCipherError;
 use rand::Rng;
 use base64::{encode, decode};
 
-/// ------------------------------------------- AES-256-CBC 模式加密、解密、生成32位aeskey和16位iv start -----------------------------------------------------
 /// Encrypt a buffer with the given key and iv using AES256/CBC/Pkcs encryption.
 /// 返回加密后的结果（字节数组），可能返回错误
 pub fn aes256_cbc_encrypt(
@@ -91,8 +96,6 @@ pub fn generate_aes_key_and_iv() -> ([u8; 32], [u8; 16]) {
     let iv: [u8; 16] = rng.gen();
     (key, iv)
 }
-
-/// ------------------------------------------- AES-256-CBC 模式加密、解密、生成32位aeskey和16位iv end -----------------------------------------------------
 
 
 

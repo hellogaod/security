@@ -7,67 +7,64 @@ use rand::Rng;
 
 /// ------------------------------------------- AES-256-CBC 模式加密、解密、生成32位aeskey和16位iv start -----------------------------------------------------
 /// Encrypt a buffer with the given key and iv using AES256/CBC/Pkcs encryption.
+/// 返回加密后的结果（字节数组），可能返回错误
 pub fn aes256_cbc_encrypt(
     data: &[u8],
-    key: &[u8; 32], // 修改为字节数组
-    iv: &[u8; 16],  // 修改为字节数组
+    key: &[u8; 32], // AES 密钥，32 字节
+    iv: &[u8; 16],  // 初始化向量（IV），16 字节
 ) -> Result<Vec<u8>, SymmetricCipherError> {
     // Validate key and IV lengths
     validate_key_and_iv(key, iv);
 
     let mut encryptor = aes::cbc_encryptor(KeySize256, key, iv, PkcsPadding);
 
-    let mut buffer = [0; 4096];
+    let mut buffer = vec![0; data.len() + 16]; // 加上 padding 空间
     let mut write_buffer = RefWriteBuffer::new(&mut buffer);
     let mut read_buffer = RefReadBuffer::new(data);
     let mut final_result = Vec::new();
 
     loop {
-        let result = encryptor.encrypt(&mut read_buffer, &mut write_buffer, true)?;
-        final_result.extend(
-            write_buffer
-                .take_read_buffer()
-                .take_remaining()
-                .iter()
-                .map(|&i| i),
-        );
-        match result {
-            crypto::buffer::BufferResult::BufferUnderflow => break,
-            _ => continue,
+        match encryptor.encrypt(&mut read_buffer, &mut write_buffer, true) {
+            Ok(result) => {
+                final_result.extend(write_buffer.take_read_buffer().take_remaining().iter().copied());
+                if let crypto::buffer::BufferResult::BufferUnderflow = result {
+                    break;
+                }
+            }
+            Err(e) => return Err(e),
         }
     }
 
     Ok(final_result)
+
 }
 
 /// Decrypt a buffer with the given key and iv using AES256/CBC/Pkcs encryption.
+/// 解密数据，返回解密后的字节数据
 pub fn aes256_cbc_decrypt(
     data: &[u8],
-    key: &[u8; 32], // 修改为字节数组
-    iv: &[u8; 16],  // 修改为字节数组
+    key: &[u8; 32], 
+    iv: &[u8; 16],  
 ) -> Result<Vec<u8>, SymmetricCipherError> {
     // Validate key and IV lengths
     validate_key_and_iv(key, iv);
 
     let mut decryptor = aes::cbc_decryptor(KeySize256, key, iv, PkcsPadding);
 
-    let mut buffer = [0; 4096];
+    let mut buffer = vec![0; data.len()]; // 创建足够大的缓冲区
     let mut write_buffer = RefWriteBuffer::new(&mut buffer);
     let mut read_buffer = RefReadBuffer::new(data);
     let mut final_result = Vec::new();
 
     loop {
-        let result = decryptor.decrypt(&mut read_buffer, &mut write_buffer, true)?;
-        final_result.extend(
-            write_buffer
-                .take_read_buffer()
-                .take_remaining()
-                .iter()
-                .map(|&i| i),
-        );
-        match result {
-            crypto::buffer::BufferResult::BufferUnderflow => break,
-            _ => continue,
+        match decryptor.decrypt(&mut read_buffer, &mut write_buffer, true) {
+            Ok(result) => {
+                final_result.extend(write_buffer.take_read_buffer().take_remaining().iter().copied());
+                if let crypto::buffer::BufferResult::BufferUnderflow = result {
+                    break;
+                }
+            }
+            Err(e) => return Err(e),
         }
     }
 

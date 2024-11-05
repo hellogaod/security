@@ -1,0 +1,17 @@
+[package]
+name = "common_utils"
+version = "0.9.0"
+edition = "2021"
+
+[dependencies]
+#
+rust-crypto = "0.2.36"     
+
+# 随机数生成
+rand = "0.8"               
+
+# 十六进制格式
+hex = "0.4"
+
+# base64
+base64 = "0.21" 

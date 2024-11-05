@@ -4,6 +4,7 @@ use crypto::blockmodes::PkcsPadding;
 use crypto::buffer::{ReadBuffer, RefReadBuffer, RefWriteBuffer, WriteBuffer};
 use crypto::symmetriccipher::SymmetricCipherError;
 use rand::Rng;
+use base64::{encode, decode};
 
 /// ------------------------------------------- AES-256-CBC 模式加密、解密、生成32位aeskey和16位iv start -----------------------------------------------------
 /// Encrypt a buffer with the given key and iv using AES256/CBC/Pkcs encryption.
@@ -12,7 +13,7 @@ pub fn aes256_cbc_encrypt(
     data: &[u8],
     key: &[u8; 32], // AES 密钥，32 字节
     iv: &[u8; 16],  // 初始化向量（IV），16 字节
-) -> Result<Vec<u8>, SymmetricCipherError> {
+) -> Result<String, SymmetricCipherError> {
     // Validate key and IV lengths
     validate_key_and_iv(key, iv);
 
@@ -35,14 +36,14 @@ pub fn aes256_cbc_encrypt(
         }
     }
 
-    Ok(final_result)
+    Ok(encode(final_result))
 
 }
 
 /// Decrypt a buffer with the given key and iv using AES256/CBC/Pkcs encryption.
 /// 解密数据，返回解密后的字节数据
 pub fn aes256_cbc_decrypt(
-    data: &[u8],
+    data: &str,
     key: &[u8; 32], 
     iv: &[u8; 16],  
 ) -> Result<Vec<u8>, SymmetricCipherError> {
@@ -50,10 +51,11 @@ pub fn aes256_cbc_decrypt(
     validate_key_and_iv(key, iv);
 
     let mut decryptor = aes::cbc_decryptor(KeySize256, key, iv, PkcsPadding);
+    let decoded_data = decode(data).map_err(|_| "base64 decode is error").unwrap();
 
     let mut buffer = vec![0; data.len()]; // 创建足够大的缓冲区
     let mut write_buffer = RefWriteBuffer::new(&mut buffer);
-    let mut read_buffer = RefReadBuffer::new(data);
+    let mut read_buffer = RefReadBuffer::new(&decoded_data);
     let mut final_result = Vec::new();
 
     loop {

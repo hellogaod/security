@@ -19,6 +19,14 @@ pub enum ErrorKind {
     Base64DecodeError,
     #[error("hmac error")]
     HmacError,
-    #[error("rsa decode error")]
-    RsaDecodeError,
+    #[error("rsa failed to generate a key")]
+    RsaGenerateKeyError,
+    #[error("rsa encrypt error")]
+    RsaEncryptionError,
+    #[error("rsa decrypt error")]
+    RsaDecryptionError,
+    #[error("rsa sign error")]
+    RsaSignError,
+    #[error("rsa verify error")]
+    RsaVerifyError,
 }

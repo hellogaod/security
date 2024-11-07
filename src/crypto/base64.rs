@@ -1,4 +1,4 @@
-use crate::utils::error::ErrorKind;
+use crate::crypto::error::ErrorKind;
 use base64::{decode, encode};
 
 /// Base64 编码函数
@@ -22,8 +22,8 @@ pub fn base64_decode(encoded: &str) -> Result<Vec<u8>, ErrorKind> {
 
 mod test {
     
-    use crate::utils::base64;
-    use crate::utils::conver;
+    use crate::crypto::base64;
+    use crate::crypto::conver;
     #[test]
     fn test_base64() {
         let str = "123456";

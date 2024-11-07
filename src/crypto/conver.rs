@@ -1,5 +1,5 @@
 
-use crate::utils::error::ErrorKind;
+use crate::crypto::error::ErrorKind;
 
 //[u8]转换成utf8编码字符串
 pub fn u8_to_string(bytes: &[u8]) -> Result<String, ErrorKind> {

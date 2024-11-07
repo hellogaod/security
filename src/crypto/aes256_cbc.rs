@@ -1,6 +1,6 @@
-use crate::utils::base64;
-use crate::utils::error::ErrorKind;
-use crate::utils::hex;
+use crate::crypto::base64;
+use crate::crypto::error::ErrorKind;
+use crate::crypto::hex;
 
 use crypto::aes;
 use crypto::aes::KeySize::KeySize256;
@@ -10,7 +10,7 @@ use rand::Rng; // 引用 error.rs 中的 AesError
 
 /// Encrypt a buffer with the given key and iv using AES256/CBC/Pkcs encryption.
 /// 返回加密后的结果（字节数组），可能返回错误
-pub fn aes256_cbc_encrypt(
+pub fn encrypt(
     data: &str,
     hex_key: &str, // AES 密钥，32 字节
     hex_iv: &str,  // 初始化向量（IV），16 字节
@@ -51,7 +51,7 @@ pub fn aes256_cbc_encrypt(
 
 /// Decrypt a buffer with the given key and iv using AES256/CBC/Pkcs encryption.
 /// 解密数据，返回解密后的utf8字符串
-pub fn aes256_cbc_decrypt(data: &str, hex_key: &str, hex_iv: &str) -> Result<String, ErrorKind> {
+pub fn decrypt(data: &str, hex_key: &str, hex_iv: &str) -> Result<String, ErrorKind> {
     // Validate key and IV lengths
     let _ = validate_key_and_iv(hex_key, hex_iv);
 
@@ -138,12 +138,12 @@ fn test_aes256_cbc() {
     let data = "Hello, world!";
 
     // 加密操作
-    let encrypted_data = aes256_cbc_encrypt(data, &hex_key, &hex_iv).unwrap();
+    let encrypted_data = encrypt(data, &hex_key, &hex_iv).unwrap();
 
     println!("加密后的数据：{}", encrypted_data);
 
     // 解密操作
-    let decrypted_data = aes256_cbc_decrypt(&encrypted_data, &hex_key, &hex_iv).unwrap();
+    let decrypted_data = decrypt(&encrypted_data, &hex_key, &hex_iv).unwrap();
 
     assert_eq!(data, decrypted_data);
     println!("解密后的数据: {}", decrypted_data);

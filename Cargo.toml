@@ -4,6 +4,10 @@ version = "0.9.0"
 edition = "2021"
 
 [dependencies]
+
+# serde_json - 用于处理 JSON 数据的库，依赖于 serde
+serde_json = "1.0"
+
 #
 rust-crypto = "0.2.36"     
 
@@ -23,10 +27,39 @@ sha2 = "0.10"    # 或者最新版
 thiserror = "2.0.0"
 
 # rsa实现加解密
-rsa = "0.7"
+rsa = "0.9.6"
 
 # 使用最新版本，建议在文档中确认当前最新版本
-zeroize = "1.5" 
+zeroize = { version = "*", features = ["derive"] }
+
+# jni - Java Native Interface，用于在 Rust 和 Java 之间进行交互，设置为可选依赖
+jni = { version = "0.20", optional = true }
+
+# neon - 用于与 Node.js 进行交互的库，启用了 napi-6 特性，默认特性关闭，可选依赖
+neon = { version = "0.10", optional = true,  features = ["napi-6"], default-features = false }
+
+[lib]
+# 库名称为 common_utils
+name = "common_utils"
+# cdylib用于输出.so,staticlib用于输出.a
+crate-type = ["cdylib","staticlib"]
 
 [dev-dependencies]
 time = "0.1.41"
+
+
+[features]
+# 定义特性
+# 默认启用 "cbinding" 特性
+default = ["cbinding"]
+
+# cbinding - 为生成 C 语言绑定的特性
+cbinding = []
+# japi - 启用 jni 特性，用于 Java 与 Rust 交互
+japi = ["jni"]
+# napi - 启用 neon 特性，用于 Node.js 与 Rust 交互
+napi = ["neon"]
+
+[build-dependencies]
+# cbindgen - 用于生成 C 头文件的工具
+cbindgen = "0.24.3"

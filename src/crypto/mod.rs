@@ -1,7 +1,8 @@
-mod aes256_cbc;
-mod base64;
-mod conver;
-mod error;
-mod hex;
-mod hmac_sha512;
-mod rsa256_pksc1;
+pub mod aes256_cbc;
+pub mod base64;
+pub mod conver;
+pub mod error;
+pub mod hex;
+pub mod hmac_sha512;
+pub mod rsa256_pksc1;
+pub use error::ErrorKind;

@@ -59,7 +59,7 @@ pub fn decrypt(data: &str, hex_key: &str, hex_iv: &str) -> Result<String, ErrorK
     let iv = hex::hex_decode(hex_iv);
 
     let mut decryptor = aes::cbc_decryptor(KeySize256, &key, &iv, PkcsPadding);
-    let decoded_data = base64::base64_decode(data).unwrap();
+    let decoded_data = base64::base64_decode_to_vec(data).unwrap();
 
     let mut buffer = vec![0; data.len()]; // 创建足够大的缓冲区
     let mut write_buffer = RefWriteBuffer::new(&mut buffer);
@@ -135,7 +135,7 @@ fn test_aes256_cbc() {
     println!("hex_aeskey: {} ,hex_iv: {}", hex_key, hex_iv);
 
     // 设置需要加密的字符串
-    let data = "Hello, world!";
+    let data = "Hello, world!哈哈哈";
 
     // 加密操作
     let encrypted_data = encrypt(data, &hex_key, &hex_iv).unwrap();

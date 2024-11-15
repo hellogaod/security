@@ -40,7 +40,7 @@ pub fn decrypt_with_private_key(private_key_pem: &str, encrypted_data: &str) -> 
     let private_key = RsaPrivateKey::from_pkcs8_pem(private_key_pem)
         .map_err(|_| ErrorKind::RsaDecryptionError)?;
 
-    let encrypted_data = base64::base64_decode(encrypted_data).map_err(|_| ErrorKind::Base64DecodeError)?;
+    let encrypted_data = base64::base64_decode_to_vec(encrypted_data).map_err(|_| ErrorKind::Base64DecodeError)?;
 
     let decrypted_data = private_key
         .decrypt(Pkcs1v15Encrypt, &encrypted_data)
@@ -76,7 +76,7 @@ pub fn verify_with_public_key(public_key_pem: &str, data: &str, signature_base64
     hasher.update(data);
     let hashed = hasher.finalize();
 
-    let signature = base64::base64_decode(signature_base64).map_err(|_| ErrorKind::Base64DecodeError)?;
+    let signature = base64::base64_decode_to_vec(signature_base64).map_err(|_| ErrorKind::Base64DecodeError)?;
 
     let padding = Pkcs1v15Sign { hash_len: Some(32), prefix: Box::new([]) };
 
@@ -90,7 +90,6 @@ pub fn verify_with_public_key(public_key_pem: &str, data: &str, signature_base64
 #[cfg(test)]
 mod tests {
     use super::*;
-    use time;
 
     #[test]
     fn test_rsa_encryption_decryption() {
